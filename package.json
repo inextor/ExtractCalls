@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "db-finger": "^2.0.4",
+    "diabetes": "^1.0.7",
+    "extension-framework": "^2.0.1",
+    "gulp": "^4.0.0",
+    "npm": "^6.8.0",
+    "promiseutil": "^2.0.1"
+  }
+}
