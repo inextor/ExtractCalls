@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function()
 			let obj = { calls: calls, xtinabotenable: false };
 			let data = getFormData( obj );
 
-			return fetch('https://shuttlewizard.com/admin/rest/addZendeskCalls.php', {
+			return fetch( config.add_calls_url, {
 				method: 'POST',
 				body:  data
 			});
