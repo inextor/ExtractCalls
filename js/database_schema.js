@@ -1,6 +1,6 @@
 export default {
 	name		: "calls"
-	,version	: 2
+	,version	: 5
 	,stores		:
 	{
 		calls :
@@ -9,7 +9,8 @@ export default {
 			,autoincrement	: false
 			,indexes	:
 			[
-				{ indexName: "date", keyPath:"date", objectParameters: { uniq : false, multiEntry: false, locale: 'auto'  } }
+				{ indexName: 'date', keyPath:'date', objectParameters: { uniq : false, multiEntry: false, locale: 'auto'  } },
+				{ indexName: 'phones', keyPath: 'phones', objectParameters: { uniq: false, multiEntry: true, locale: 'auto' } }
 			]
 		}
 	}

@@ -2,40 +2,35 @@
 	node ./node_modules/gulp/bin/gulp.js
 */
 var gulp			= require('gulp');
+var merge			= require('merge-stream');
 
-function index_task(cb)
+function index_task()
 {
-	gulp.src(['./*.html','./manifest.json']).pipe(gulp.dest('dist/'));
-	cb();
+	return gulp.src(['./*.html','./manifest.json']).pipe(gulp.dest('dist/'));
 }
 
-function scripts_task(cb)
+function scripts_task( )
 {
-	console.log('scripts');
-
-	gulp.src(['./node_modules/promiseutil/*.js']).pipe(gulp.dest('dist/js/PromiseUtils/'));
-	gulp.src(['./node_modules/extension-framework/*.js']).pipe(gulp.dest('dist/js/Extension-Framework/'));
-	gulp.src(['./node_modules/diabetes/Util.js']).pipe(gulp.dest('dist/js/Diabetes/'));
-	gulp.src(['./node_modules/db-finger/DatabaseStore.js']).pipe(gulp.dest('dist/js/Finger/'));
-
-	gulp.src([ './images/*.*']).pipe( gulp.dest('dist/images/') );
-	gulp.src([ './js/*.js']).pipe( gulp.dest('dist/js/') );
-
-
-	cb();
+    return merge
+	(
+    	gulp.src(['./node_modules/promiseutil/*.js']).pipe(gulp.dest('dist/PromiseUtils/'))
+    	,gulp.src(['./node_modules/extension-framework/*.js']).pipe(gulp.dest('dist/Extension-Framework/'))
+    	,gulp.src(['./node_modules/diabetes/Util.js']).pipe(gulp.dest('dist/Diabetes/'))
+    	,gulp.src(['./node_modules/db-finger/DatabaseStore.js']).pipe(gulp.dest('dist/Finger/'))
+    	,gulp.src(['./images/*.*']).pipe( gulp.dest('dist/images/') )
+      	,gulp.src(['./js/*.js']).pipe( gulp.dest('dist/js/') )
+	);
 }
 
-function css_task(cb)
+function css_task()
 {
-	console.log('css_task');
-	gulp.src(['./css/*.css']).pipe(gulp.dest('dist/css'));
-	cb();
+	return gulp.src(['./css/*.css']).pipe(gulp.dest('dist/css'));
 }
 
 function watch_task(cb)
 {
 	console.log('watch');
-	gulp.watch([
+	return gulp.watch([
 			'./index.html',
 			'./css/*.css',
 			'./js/*.js',
@@ -44,13 +39,7 @@ function watch_task(cb)
 			'./node_modules/extension-framework/*.js',
 			'./node_modules/promiseutil/PromiseUtils.js',
       		'./node_modules/db-finger/DatabaseStore.js',
-      		'./node_modules/diabetes/Util.js'],gulp.parallel('scripts_task','css_task','index_task'));
-
-	cb();
+      		'./node_modules/diabetes/Util.js'],gulp.parallel(css_task,index_task,scripts_task));
 }
 
-gulp.task('css_task',css_task);
-gulp.task('scripts_task', scripts_task );
-gulp.task('index_task', index_task);
-
-exports.default = gulp.series( css_task, scripts_task, watch_task, index_task );
+exports.default = gulp.series( scripts_task, css_task,index_task,watch_task );

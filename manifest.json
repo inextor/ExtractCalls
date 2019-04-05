@@ -13,5 +13,5 @@
 			,"js": [ "js/content_loader.js" ]
 		}
 	]
-	,"web_accessible_resources":[ "js/*" ]
+	,"web_accessible_resources":[ "js/*","Diabetes/*","Extension-Framework/*","Finger/*" ]
 }
