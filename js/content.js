@@ -8,7 +8,7 @@ setTimeout(()=>window.location.reload(), 30*60*1000  );
 
 export default function main()
 {
-    console.log('Loaded');
+  console.log('Loaded');
 
 	if( window.location.hostname !== config.site )
 	{
@@ -52,15 +52,15 @@ function loop_function()
 
             if( text == 'Settings' )
             {
-				console.log('Going to history');
-                let panels  = Array.from( doc.querySelectorAll('.voice-settings li[aria-selected="false"]>div') );
-                let history = panels.find( i=>i.textContent == 'History' );
+				      console.log('Going to history');
+              let panels  = Array.from( doc.querySelectorAll('.voice-settings li[aria-selected="false"]>div') );
+              let history = panels.find( i=>i.textContent == 'History' );
 
-                if( history )
-                {
-                    history.click();
-                    return;
-                }
+              if( history )
+              {
+                history.click();
+                return;
+              }
             }
 
 
@@ -88,27 +88,7 @@ function loop_function()
 				});
 				return;
 			}
-        }
-
-		console.log('It reach the left and 2');
-		/*
-		var first = doc.querySelector('.c-btn.c-pagination--left');
-		var one		= doc.querySelector('button.c-btn.is-active[value="1"]');
-		var historyAnchor = doc.querySelector('li.tab-history span:nth-child(2)');
-
-		if( one )
-		{
-			doc.querySelector('.c-pagination.center button[value="2"]').click();
-		}
-		else if( first )
-		{
-		    first.click();
-		}
-		else if( historyAnchor )
-		{
-			historyAnchor.click();
-		}
-		*/
+    }
 	}
 	else if( window.location.href == 'https://'+config.host_prefix+'/agent/admin/overview' )
 	{
@@ -187,4 +167,3 @@ function extractCalls( doc )
 
 	return Promise.resolve( calls );
 }
-

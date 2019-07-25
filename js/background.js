@@ -3,6 +3,7 @@ import Server from '../Extension-Framework/Server.js';
 import config from './config.js';
 import database_schema from './database_schema.js';
 import PromiseUtil from '../PromiseUtils/PromiseUtils.js';
+import Utils from '../Diabetes/Util.js';
 
 window.onerror = function(err){
     console.log(err); // logs all errors
@@ -104,6 +105,7 @@ function getCall( call_info )
 		,date			: getUTCMysqlTimestamp( call_info['qa-datetime'] )
 		,local_time		: getMysqlTimestamp( call_info['qa-datetime'] )
 		,to				: call_info['qa-to']
+		,is_solved: false
 		,from			: call_info['qa-from']
 		,agent			: call_info['qa-agent']
 		,call_status	: call_info['qa-status']
@@ -127,23 +129,31 @@ function getCall( call_info )
 function createTicket(call)
 {
 	console.log('Making a http call for create a ticket',call);
-	return Promise.resolve( call );
-	//var promise = axhrw
-	//({
 
-	//	method				: 'POST'			//,'POST',...
-	//	,url				: config.create_ticket_url		//Required
-	//	//,headers			: { "connection"	: config.http_connection }
-	//	,data				:
-	//	{
-	//		title			: 'Missed Call From '+i['qa-from']+' '+date
-	//		,message			: 'Missed Call From '+i['qa-from']+' '+date
-	//					+'\nCall Status: '+i['qa-status']
-	//					+'\nCall To: '+i['qa-to']
-    //                    +'\nWait Time: '+i['qa-wait-time']
-    //                    +'\nHold Time: '+i['qa-hold-time']
-	//	}
-	//})
+	return Promise.resolve( call );
+
+	let data = new FormData();
+	data.append("title", "Missed Call From "+call.from+' '.call.date );
+	data.append("message","Mised call from:"+
+	    call.from+' '+call.date+'\r'+
+	    'Call Status: '+call.call_status+'\n'
+	    'Call To: '+call.to+'\r'
+	    'Wait Time: '+call.wait_time+'\r'
+	    'Hold Time: '+call.hold_time
+	)
+
+	fetch( config.create_ticket_url ,{method: "POST", body: data})
+	  .then((response)=>
+	  {
+	    return response.json()
+	  })
+	  .then((json)=>{
+	    console.log( json );
+	  })
+	  .catch((e)=>
+	  {
+	    console.error("An error occurred",e)
+	  });
 
 }
 
@@ -174,8 +184,8 @@ function processCallsFound( calls_info )
 
 			if( calls_to_save.length > 0 )
 			{
-				//TODO
 				console.log('Sending calls to be saved',calls_to_save);
+				saveCallsOnServer( calls_to_save )
 			}
 		})
 		.catch((e)=>
@@ -185,9 +195,28 @@ function processCallsFound( calls_info )
 	}
 }
 
+function saveCallsOnServer( calls_to_save )
+{
+  let data = { calls: calls_to_save };
+  let formData = Utils.getFormData( data );
+
+  fetch( config.add_calls_url, { method: "POST", body: formData } )
+    .then((response)=>
+    {
+      return response.json();
+    })
+    .then((response)=>{
+      console.log('Response from server was', response );
+    })
+    .catch((error)=>{
+      console.log('An error occurred saving the calls on server',error);
+    });
+
+}
+
 function call_was_solved( call )
 {
-	if( 'is_solved' in call && call.is_solved )
+	if( call.is_solved )
 		return Promise.resolve( true );
 
 	return db.getAll('calls',{ index: 'date', '>=': call.from } ).then((calls)=>
@@ -198,7 +227,7 @@ function call_was_solved( call )
 
 			if( other.to === call.from || other.from === call.from)
 			{
-				if( other.date > call.date && other.call_status == 'Completed' )
+				if( other.date > call.date && other.call_status === 'Completed' )
 					return true;
 			}
 			return false;
